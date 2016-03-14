@@ -90,7 +90,7 @@ class Fisher:
         sigma0, sigma1 = np.std(x0_proy), np.std(x1_proy)
         self.c_comp(p0, p1, sigma0, sigma1, m0_proy, m1_proy)
         
-        def classify_fisher(self, x):
+    def classify_fisher(self, x):
         """ Classifies the given points thanks to the previous training.
 
         Parameters
@@ -105,7 +105,7 @@ class Fisher:
             from 0 to M, and ci = 0 or ci = 1
 
         """
-		x = np.asarray(x)
-		return ((x.dot(self.w) >= self.c).astype(int)).tolist()
+	x = np.asarray(x)
+	return ((x.dot(self.w) >= self.c).astype(int)).tolist()
 		
 
