@@ -16,7 +16,7 @@ The first one is LDA, which performs the Linear Discrimant Analysis (based on Se
 
 ## Authors
 
-This project is been developed by Ana María Martínez Gómez and Víctor Adolfo Gallego Alcalá.
+This project is been developed by Ana María Martínez Gómez and Víctor Adolfo Gallego Alcalá. Although the development hadn't been possible without our teacher Antonio Valdés and his useful classes and feedback.
 
 
 
