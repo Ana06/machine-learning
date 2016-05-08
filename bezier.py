@@ -9,6 +9,8 @@ backward_differences_bezier - Another approximation method. From the initial
    points of the curve, it computes the rest of the interval.
 """
 
+__author__ = "Ana María Martínez Gómez, Víctor Adolfo Gallego Alcalá"
+
 %matplotlib inline
 from __future__ import division
 import numpy as np

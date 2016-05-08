@@ -6,6 +6,8 @@ second is PCA, which implements the Principal Component Analysis.
 
 """
 
+__author__ = "Ana María Martínez Gómez, Víctor Adolfo Gallego Alcalá"
+
 from __future__ import division
 import numpy as np
 from scipy.linalg import eigh

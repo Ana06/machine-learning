@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+"""This module contains the class Fisher to use Fisher's Linear Discriminant"""
+
+__author__ = "Ana María Martínez Gómez, Víctor Adolfo Gallego Alcalá"
 
 from __future__ import division
 import numpy as np
