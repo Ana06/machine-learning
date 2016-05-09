@@ -9,8 +9,6 @@ backward_differences_bezier - Another approximation method. From the initial
    points of the curve, it computes the rest of the interval.
 """
 
-__author__ = "Ana María Martínez Gómez, Víctor Adolfo Gallego Alcalá"
-
 %matplotlib inline
 from __future__ import division
 import numpy as np
@@ -41,6 +39,77 @@ def binom(n, k):
         np.math.factorial(n - k)
 
 
+def bernstein_recursive(n, k, t):
+    """Helper method. Computes the recurrence relation
+    B_i^{n+1}(t) = t * B_{i-1}(t) + (1 - t) * B_i^n(t)
+
+    Parameters
+    ----------
+    n : integer. Corresponds to the degree of the curve.
+    k : integer. Corresponds to the number of monomial in the polynomial.
+    t : array of float. The instants in which we evaluate the curve.
+
+    Returns
+    -------
+    array of float of the same dim as t. The result of the relation.
+
+    """
+    if n == 0 and k == 0:
+        return 1
+    if k == -1 or k == n + 1:
+        return 0
+    if (n - 1, k - 1) in RECURSIVE_BERNSTEIN_DICT:
+        b1 = RECURSIVE_BERNSTEIN_DICT[(n - 1, k - 1)]
+    else:
+        b1 = bernstein_recursive(n - 1, k - 1, t)
+        RECURSIVE_BERNSTEIN_DICT[(n - 1, k - 1)] = b1
+    if (n - 1, k) in RECURSIVE_BERNSTEIN_DICT:
+        b2 = RECURSIVE_BERNSTEIN_DICT[(n - 1, k)]
+    else:
+        b2 = bernstein_recursive(n - 1, k, t)
+        RECURSIVE_BERNSTEIN_DICT[(n - 1, k)] = b2
+    return t * b1 + (1 - t) * b2
+
+
+def polyeval_bezier(P, num_points, algorithm):
+    """Directly evaluates the polynomial describing the curve. The algorithms
+    are described in Prautzsch H.,et al. Bézier and B-Spline Techniques.
+
+    Parameters
+    ----------
+    P : (n+1)xdim array of float. The control points of the curve.
+    num_points : integer. The number of points to evaluate.
+    algorithm : string. May be:
+        direct - simply evaluates \sum_{i=0}^n b_i * B_i^n(t), where
+          b_i are the control points and B_i^n are the elements of the
+          Bézier basis.
+        recursive - uses the relation described in bernstein_recursive.
+        horner - evaluates the polynomial using the Horner method.
+        deCasteljau - performs the de Casteljau's algorithm.
+
+    Returns
+    -------
+    Nxdim array of float. The curve points.
+
+    """
+    P = np.asarray(P, dtype=np.float64).T
+    dim, n = P.shape
+    n -= 1
+    t = np.linspace(0, 1, num_points)
+    if algorithm == 'direct':
+        solution = direct_eval(P, t, n, num_points)
+    elif algorithm == 'recursive':
+        solution = recursive_eval(P, t, n, dim, num_points)
+    elif algorithm == 'horner':
+        solution = horner_eval(P, t, n, dim)
+    elif algorithm == 'deCasteljau':
+        solution = casteljau(P, t, num_points, n)
+    plt.plot(solution[0,:], solution[1,:])
+    plt.hold(True)
+    plt.plot(P[0,:], P[1,:], '--om')
+    return solution.T
+
+
 def direct_eval(P, t, n, num_points):
     """Helper method of polyeval_bezier. See its docstring for more
     details.
@@ -64,6 +133,78 @@ def direct_eval(P, t, n, num_points):
         T[k, :] = t**k * tt**(n - k)
         bernstein = np.einsum('i,ij->ij', C, T)
     return np.dot(P, bernstein)
+
+
+def recursive_eval(P, t, n, dim, num_points):
+    """Helper method of polyeval_bezier. See its docstring for more
+    details.
+
+    Parameters
+    ----------
+    P : (n+1)xdim array of float. The control points of the curve.
+    num_points : integer. The number of points to evaluate.
+    t : array of float. The sample time points to evaluate.
+    n : integer. The degree of the curve
+    dim : integer. The dimension of the curve.
+
+    Returns
+    -------
+    dimxN array of float. The curve points.
+
+    """
+    my_sum = np.zeros([dim, num_points])
+    for k in xrange(n + 1):
+        my_sum += bernstein_recursive(n, k, t) * P[:, k][:, np.newaxis]
+    return my_sum
+
+
+def horner_eval(P, t, n, dim):
+    """Helper method of polyeval_bezier. See its docstring for more
+    details.
+
+    Parameters
+    ----------
+    P : (n+1)xdim array of float. The control points of the curve.
+    t : array of float. The sample time points to evaluate.
+    n : integer. The degree of the curve
+    dim : integer. The dimension of the curve.
+
+    Returns
+    -------
+    dimxN array of float. The curve points.
+
+    """
+    # We can concatenate the end point instead of splitting the interval.
+    tt = t[:-1]
+    onemt = 1 - tt  # Precompute for better performance
+    C = np.asarray([binom(n, k) for k in xrange(n + 1)])
+    first = np.asarray([np.polyval(C * P[k, :], tt / (onemt))
+                        for k in xrange(dim)]) * (onemt)**n
+    last = P[:, 0][:, np.newaxis]
+    return np.hstack([first, last])[:, ::-1]
+
+
+def casteljau(P, t, num_points, n):
+    """Helper method of polyeval_bezier. See its docstring for more
+    details.
+
+    Parameters
+    ----------
+    P : (n+1)xdim array of float. The control points of the curve.
+    num_points : integer. The number of points to evaluate.
+    t : array of float. The sample time points to evaluate.
+    n : integer. The degree of the curve
+
+    Returns
+    -------
+    dimxN array of float. The curve points.
+
+    """
+    T = np.repeat(np.atleast_3d(P), num_points, axis=2)
+    for i in xrange(n):
+        T[:, 0:(n - i), :] = (1 - t) * T[:, 0:(n - i), :] + \
+            t * T[:, 1:(n - i) + 1, :]
+    return T[:, 0, :]
 
 
 def bezier_subdivision(P, k, epsilon, lines=False):
@@ -173,3 +314,4 @@ def backward_differences_bezier(P, m, h=None):
     plt.hold(True)
     plt.plot(P[0,:], P[1,:], '--om')
     return solution
+    
