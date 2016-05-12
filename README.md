@@ -15,13 +15,12 @@ This module implements two mecanisms for dimensionality reduction. The first one
         
 ### bezier.py
 
-This module implements several algorithms to evaluate Bezier curves.
-
+This module implements several algorithms to evaluate Bezier curves. For further references, please see Chapters 2 and 3 from Bézier and B-Spline Techniques by Prautzsch, H., Boehm, W., Paluszny, M.
 	
 	
 ## Authors
 
-This project is been developed by Ana María Martínez Gómez and Víctor Adolfo Gallego Alcalá. Although the development hadn't been possible without our teacher Antonio Valdés and his useful classes and feedback.
+This project is being developed by Ana María Martínez Gómez and Víctor Adolfo Gallego Alcalá. 
 
 
 
