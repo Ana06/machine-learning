@@ -16,6 +16,24 @@ This module implements two mecanisms for dimensionality reduction. The first one
 ### bezier.py
 
 This module implements several algorithms to evaluate Bezier curves. For further references, please see Chapters 2 and 3 from Bézier and B-Spline Techniques by Prautzsch, H., Boehm, W., Paluszny, M.
+
+### Interactive.ipynb
+
+This notebook makes it possible to play with two Bézier curves. You can add or move control points of one curve using left click, and right click for the second curve. It also computes their intersections.
+
+### Surfaces.ipynb
+
+This notebook renders a Bézier surface given its control points. As an example, we render the typical Utah teapot.
+
+<img src=teapot.png width=618 height=440 alt='Utah teapot' />
+
+### Convex Hull.ipynb
+
+This notebook implements the Graham's algorithm to compute the convex hull of a set of points in the plane.
+
+### Convex Hull 3D.ipynb
+
+This notebook implements a beneath-beyond algorithm to compute the convex hull of a set of points in the space. It can also compute Delaunay triangulations in 2D using a trick.
 	
 	
 ## Authors
